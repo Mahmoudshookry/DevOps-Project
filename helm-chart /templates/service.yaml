@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}  # Name of the service
+spec:
+  type: {{ .Values.service.type | default "NodePort" }}  # Service type (default: NodePort)
+  ports:
+  - port: {{ .Values.service.port | default 80 }}  # Service port
+    targetPort: {{ .Values.service.targetPort | default 80 }}  # Target container port
+    nodePort: {{ .Values.service.nodePort | default 30000 }}  # NodePort value
+  selector:
+    app: {{ .Release.Name }}  # Selector for the pods
