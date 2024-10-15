@@ -5,7 +5,7 @@ terraform {
     region         = "us-east-1"
     encrypt        = false
   }
-}
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -34,9 +34,9 @@ module "network" {
 module "ec2" {
   source              = "./modules/ec2"
   ami                 = var.ami
-  instance_type      = var.instance_type
-  vpc_id             = module.network.vpc_id
-  subnet_id          = module.network.subnet_id
-  security_group_id  = module.network.security_group_id
-  key_name           = "project"
+  instance_type       = var.instance_type
+  vpc_id              = module.network.vpc_id
+  subnet_id           = module.network.subnet_id
+  security_group_id   = module.network.security_group_id
+  key_name            = "project"
 }
