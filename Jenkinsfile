@@ -53,7 +53,7 @@ pipeline {
                 dir('aws-k8s-terraform') {
                     script {
                         // Initialize Terraform
-                        sh 'terraform init'
+                        sh 'terraform init -upgrade'
                     }
                 }
             }
