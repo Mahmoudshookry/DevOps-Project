@@ -37,7 +37,7 @@
 
 - name: Get the join command from the master node
   ansible.builtin.set_fact:
-    join_command: "{{ hostvars[groups['master'][0]].join_command }}"
+    join_command: "{{ hostvars[groups['group_Name_master'][0]].join_command }}"
 
 - name: Join the Kubernetes cluster
   ansible.builtin.command: "{{ join_command }}"
