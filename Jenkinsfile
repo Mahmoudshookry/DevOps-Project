@@ -3,11 +3,11 @@ pipeline {
 
     environment {
         // Set up environment variables for AWS and GitHub
-        AWS_ACCESS_KEY_ID     = credentials('AWS-Credinitial')         // AWS Access Key from Jenkins Credentials
-        AWS_SECRET_ACCESS_KEY = credentials('AWS-Credinitial')         // AWS Secret Key from Jenkins Credentials
-        GITHUB_TOKEN          = credentials('github-token')              // GitHub token for private repository access
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')   // Docker Hub credentials
-        DOCKER_IMAGE          = "m3bdlkawy/depi-project"               // Docker image name
+        AWS_ACCESS_KEY_ID     = credentials('AWS-Credinitial')   // AWS Access Key from Jenkins Credentials
+        AWS_SECRET_ACCESS_KEY = credentials('AWS-Credinitial')   // AWS Secret Key from Jenkins Credentials
+        GITHUB_TOKEN          = credentials('github-token')      // GitHub token for private repository access
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') // Docker Hub credentials
+        DOCKER_IMAGE          = "m3bdlkawy/depi-project" // Docker image name
     }
 
     options {
@@ -27,6 +27,18 @@ pipeline {
                 script {
                     // Build the Docker image
                     dockerImage = docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    // Push the Docker image to Docker Hub
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        dockerImage.push("${env.BUILD_NUMBER}")
+                        dockerImage.push("latest")
+                    }
                 }
             }
         }
@@ -81,6 +93,7 @@ pipeline {
             }
         }
 
+
         stage('Run Ansible Playbook') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'private-key', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USER')]) {
@@ -89,29 +102,14 @@ pipeline {
                             // Run Ansible playbook
                             sh """
                             ansible-playbook -i inventory_aws_ec2.yaml playbook.yml \
-                            --private-key \$SSH_KEY_PATH \
-                            -u \$SSH_USER
+                            --private-key $SSH_KEY_PATH \
+                            -u $SSH_USER
                             """
                         }
                     }
                 }
             }
         }
-
-        stage('Deploy Helm Chart') {
-            steps {
-                script {
-                    // Navigate to the directory containing the Helm chart if necessary
-                    dir('./helm-chart') {
-                        // Install or upgrade the Helm release
-                        sh """
-                        helm upgrade --install my-release ./ --values values.yaml --namespace testing-namespace --create-namespace
-                        """
-                    }
-                }
-            }
-        }
-    }
 
     post {
         success {
@@ -122,3 +120,6 @@ pipeline {
         }
     }
 }
+
+
+
