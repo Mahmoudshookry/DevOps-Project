@@ -21,3 +21,47 @@
 
   roles:
   - role: worker
+
+- hosts: group_Name_master
+  become: true
+  gather_facts: no
+  tasks:
+  - name: Install required packages
+    apt:
+      name:
+      - curl
+      - software-properties-common
+      state: present
+      update_cache: yes
+
+  - name: Download Helm installation script
+    command: curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+
+  - name: Make the installation script executable
+    command: chmod 700 get_helm.sh
+
+  - name: Run the Helm installation script with superuser privileges
+    command: ./get_helm.sh
+    args:
+      executable: /bin/bash
+
+  - name: Clean up installation script
+    file:
+      path: ./get_helm.sh
+      state: absent
+
+  - name: Verify Helm installation
+    command: helm version
+    register: helm_version
+
+  - debug:
+      var: helm_version.stdout
+
+
+  - name: Add the stable Helm repository
+    command: helm repo add stable https://charts.helm.sh/stable
+    args:
+      warn: false
+
+  - name: Update Helm repositories
+    command: helm repo update

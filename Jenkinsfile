@@ -7,7 +7,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS-Credinitial')   // AWS Secret Key from Jenkins Credentials
         GITHUB_TOKEN          = credentials('github-token')      // GitHub token for private repository access
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') // Docker Hub credentials
-        DOCKER_IMAGE          = "hamada710/myfirstrepo" // Docker image name
+        DOCKER_IMAGE          = "m3bdlkawy/depi-project" // Docker image name
     }
 
     options {
