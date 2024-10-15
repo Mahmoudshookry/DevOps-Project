@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 4200;
+const PORT = process.env.PORT || 4200;
 
 // Serve static files from the 'public' directory
 app.use(express.static("public"));
@@ -17,7 +17,6 @@ const teammates = [
 
 // Define the root route
 app.get("/", (req, res) => {
-  // Create a list of teammates
   const teammatesList = teammates.map((name) => `<li>${name}</li>`).join("");
 
   res.send(`
@@ -46,7 +45,11 @@ app.get("/", (req, res) => {
     `);
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
-});
+// Only start the server if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
