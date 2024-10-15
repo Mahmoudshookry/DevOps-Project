@@ -60,7 +60,6 @@
   roles:
   - role: worker
 
----
 - name: Deploy Helm Chart on Master Node
   hosts: roup_Name_master
   become: true
