@@ -3,75 +3,95 @@
   gather_facts: true
 
   roles:
-  - role: containerd
-  - role: common
-  - role: kubernetes
+    - role: containerd
+    - role: common
+    - role: kubernetes
 
 - hosts: group_Name_master
   become: true
   gather_facts: true
 
   roles:
-  - role: master
-  - role: cni
+    - role: master
+    - role: cni
 
   tasks:
-  - name: Install required packages
-    apt:
-      name:
-      - curl
-      - software-properties-common
-      state: present
-      update_cache: yes
+    - name: Install required packages
+      apt:
+        name:
+          - curl
+          - software-properties-common
+        state: present
+        update_cache: yes
 
-  - name: Download Helm installation script
-    get_url:
-      url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-      dest: ./get_helm.sh
-      mode: 'u+x' # Make it executable
+    - name: Download Helm installation script
+      get_url:
+        url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        dest: /home/ubuntu/get_helm.sh  # Use full path
+        mode: 'u+x'
 
-  - name: Run the Helm installation script with superuser privileges
-    command: ./get_helm.sh
-    args:
-      executable: /bin/bash
+    - name: Check if the Helm installation script was downloaded
+      ansible.builtin.stat:
+        path: /home/ubuntu/get_helm.sh
+      register: helm_script
 
-  - name: Clean up installation script
-    file:
-      path: ./get_helm.sh
-      state: absent
+    - name: Fail if Helm script is not found
+      fail:
+        msg: "Helm installation script was not downloaded!"
+      when: not helm_script.stat.exists
 
-  - name: Verify Helm installation
-    command: helm version
-    register: helm_version
+    - name: Run the Helm installation script with superuser privileges
+      command: /home/ubuntu/get_helm.sh  # Use full path
+      args:
+        chdir: /home/ubuntu  # Change to the user's home directory
 
-  - debug:
-      var: helm_version.stdout
+    - name: Clean up installation script
+      file:
+        path: /home/ubuntu/get_helm.sh
+        state: absent
 
-  - name: Add the stable Helm repository
-    command: helm repo add stable https://charts.helm.sh/stable
+    - name: Verify Helm installation
+      command: helm version
+      register: helm_version
 
-  - name: Update Helm repositories
-    command: helm repo update
+    - debug:
+        var: helm_version.stdout
+
+    - name: Add the stable Helm repository
+      command: helm repo add stable https://charts.helm.sh/stable
+
+    - name: Update Helm repositories
+      command: helm repo update
 
 - hosts: group_Name_worker
   become: true
   gather_facts: true
 
   roles:
-  - role: worker
+    - role: worker
 
+<<<<<<< HEAD
 - name: Deploy Helm Chart on Master Node
   hosts: roup_Name_master
+=======
+- hosts: group_Name_master
+>>>>>>> c16ef8c736a98395825936e1ba8e630071d25be9
   become: true
   tasks:
-  - name: Clone the repository
-    git:
-      repo: 'https://github.com/Mahmoudshookry/DevOps-Project.git'
-      dest: ~/DevOps-Project
-      version: master # Specify the branch if needed
-      force: yes # Optional: force overwrite if the directory already exists
+    - name: Clone the repository
+      git:
+        repo: 'https://github.com/Mahmoudshookry/DevOps-Project.git'
+        dest: /home/ubuntu/DevOps-Project
+        version: master
+        force: yes
 
-  - name: Upgrade Helm release
-    command: helm upgrade my-release ./helm-chart --values ./helm-chart/values.yaml --namespace testing-namespace --create-namespace
-    args:
-      chdir: ~/DevOps-Project/helm-chart
+    - name: Check if helm-chart directory exists
+      ansible.builtin.stat:
+        path: /home/ubuntu/DevOps-Project/helm-chart
+      register: helm_chart_dir
+
+    - name: Upgrade Helm release
+      command: helm upgrade my-release ./helm-chart --values ./helm-chart/values.yaml --namespace testing-namespace --create-namespace
+      args:
+        chdir: /home/ubuntu/DevOps-Project/helm-chart
+      when: helm_chart_dir.stat.exists
