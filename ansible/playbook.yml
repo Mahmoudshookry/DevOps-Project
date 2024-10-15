@@ -28,7 +28,7 @@
       get_url:
         url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
         dest: ~/get_helm.sh
-        mode: 'u+x' 
+        mode: 'u+x'
 
     - name: Run the Helm installation script with superuser privileges
       command: ./get_helm.sh
