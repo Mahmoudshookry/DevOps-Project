@@ -28,12 +28,10 @@
     get_url:
       url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
       dest: ./get_helm.sh
-      mode: 'u+x' # Make it executable
+      mode: 'u+x' 
 
   - name: Run the Helm installation script with superuser privileges
     command: ./get_helm.sh
-    args:
-      executable: /bin/bash
 
   - name: Clean up installation script
     file:
@@ -61,7 +59,7 @@
   - role: worker
 
 - name: Deploy Helm Chart on Master Node
-  hosts: roup_Name_master
+  hosts: group_Name_master
   become: true
   tasks:
   - name: Clone the repository
