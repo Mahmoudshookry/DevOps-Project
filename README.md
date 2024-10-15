@@ -1,3 +1,7 @@
+
+![Screenshot from 2024-10-15 23-48-03](https://github.com/user-attachments/assets/edbd0919-c52e-4851-97f3-79211c90047a)
+
+
 # Infrastructure Automation and Kubernetes Deployment
 
 ## Overview
