@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}  # Name of the deployment
+  namespace: {{ .Values.namespace | default "default" }}  # Specify the namespace
 spec:
   replicas: {{ .Values.replicaCount | default 1 }}  # Number of replicas (default: 1)
   selector:

@@ -3,7 +3,7 @@ replicaCount: 1
 
 # Container image repository URL (e.g., Docker Hub or GitHub Container Registry)
 image:
-  repository: "<your-github-registry>/<your-app>"
+  repository: "m3bdlkawy/depi-project"
   # The specific tag of the image to deploy
   tag: "latest"
 
@@ -33,3 +33,5 @@ resources:
     # Minimum amount of CPU the container is guaranteed to have
     cpu: "250m"
 
+# Namespace for deploying the application (optional, set default if needed)
+namespace: "testing-namespace" # Adjust this to your desired namespace
