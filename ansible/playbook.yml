@@ -27,17 +27,27 @@
     - name: Download Helm installation script
       get_url:
         url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-        dest: ~/get_helm.sh
+        dest: /home/ubuntu/get_helm.sh  # Use full path
         mode: 'u+x'
 
+    - name: Check if the Helm installation script was downloaded
+      ansible.builtin.stat:
+        path: /home/ubuntu/get_helm.sh
+      register: helm_script
+
+    - name: Fail if Helm script is not found
+      fail:
+        msg: "Helm installation script was not downloaded!"
+      when: not helm_script.stat.exists
+
     - name: Run the Helm installation script with superuser privileges
-      command: ./get_helm.sh
+      command: /home/ubuntu/get_helm.sh  # Use full path
       args:
-        chdir: ~  # Change to the user's home directory
+        chdir: /home/ubuntu  # Change to the user's home directory
 
     - name: Clean up installation script
       file:
-        path: ~/get_helm.sh
+        path: /home/ubuntu/get_helm.sh
         state: absent
 
     - name: Verify Helm installation
