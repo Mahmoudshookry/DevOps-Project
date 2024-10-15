@@ -66,10 +66,17 @@
     git:
       repo: 'https://github.com/Mahmoudshookry/DevOps-Project.git'
       dest: ~/DevOps-Project
-      version: master # Specify the branch if needed
-      force: yes # Optional: force overwrite if the directory already exists
+      version: master
+      force: yes
 
-  - name: Upgrade Helm release
-    command: helm upgrade my-release ./helm-chart --values ./helm-chart/values.yaml --namespace testing-namespace --create-namespace
-    args:
-      chdir: ~/DevOps-Project/helm-chart
+- name: Check if helm-chart directory exists
+  ansible.builtin.stat:
+    path: /home/ubuntu/DevOps-Project/helm-chart
+  register: helm_chart_dir
+
+- name: Upgrade Helm release
+  command: helm upgrade my-release ./helm-chart --values ./helm-chart/values.yaml --namespace testing-namespace --create-namespace
+  args:
+    chdir: /home/ubuntu/DevOps-Project/helm-chart
+  when: helm_chart_dir.stat.exists
+
