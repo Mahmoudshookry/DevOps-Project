@@ -9,14 +9,15 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.76.0"
+      version = "= 5.71.0"
     }
   }
 }
 
 provider "aws" {
-  region = "us-east-1"  # Your preferred region
+  region = "us-east-1"
 }
+
 
 
 # Call Network Module
