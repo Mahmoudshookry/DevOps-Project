@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../app'); // Adjust the path to your app file
+const app = require('../app'); // Make sure this points to your app file
 
 describe('GET /', () => {
   it('should return status code 200 and contain teammates list', async () => {
