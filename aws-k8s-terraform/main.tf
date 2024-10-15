@@ -6,10 +6,16 @@ terraform {
     encrypt        = false
   }
 }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.71.0"
+    }
+  }
+}
 
 provider "aws" {
-  region = "us-east-1"  # Change to your preferred region
-  version = ">= 5.76.0"
+  region = "us-east-1"  # Your preferred region
 }
 
 # Call Network Module
