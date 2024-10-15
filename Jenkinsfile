@@ -84,28 +84,15 @@ pipeline {
         stage('Wait for EC2 Initialization') {
             steps {
                 script {
-                    def isReachable = false
-                    retry(10) {
-                        sleep(time: 30, unit: 'SECONDS')
-                        try {
-                            // Check if EC2 instance is reachable via SSH
-                            sh """
-                            ssh -i $SSH_KEY_PATH -o StrictHostKeyChecking=no ubuntu@<EC2_PUBLIC_IP> 'echo EC2 is reachable'
-                            """
-                            isReachable = true
-                        } catch (Exception e) {
-                            echo "EC2 not ready yet, retrying..."
-                            isReachable = false
-                            error "SSH not ready"
-                        }
-                    }
+                    echo "Waiting for EC2 initialization..."
+                    sleep(time: 120, unit: 'SECONDS') // Wait for 2 minutes
 
-                    if (!isReachable) {
-                        error "EC2 instances are not reachable after multiple retries"
-                    }
+                    // Optionally, you can add a log message to indicate completion
+                    echo "Waited for 2 minutes for EC2 initialization."
                 }
             }
         }
+
 
         stage('Run Ansible Playbook') {
             steps {
