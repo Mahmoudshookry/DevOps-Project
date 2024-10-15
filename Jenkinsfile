@@ -11,7 +11,7 @@ pipeline {
     }
 
     options {
-        retry(3) // Optional: retry on failures
+        retry(1) // Optional: retry on failures
     }
 
     stages {
@@ -81,12 +81,38 @@ pipeline {
             }
         }
 
+        stage('Wait for EC2 Initialization') {
+            steps {
+                script {
+                    def isReachable = false
+                    retry(10) {
+                        sleep(time: 30, unit: 'SECONDS')
+                        try {
+                            // Check if EC2 instance is reachable via SSH
+                            sh """
+                            ssh -i $SSH_KEY_PATH -o StrictHostKeyChecking=no ubuntu@<EC2_PUBLIC_IP> 'echo EC2 is reachable'
+                            """
+                            isReachable = true
+                        } catch (Exception e) {
+                            echo "EC2 not ready yet, retrying..."
+                            isReachable = false
+                            error "SSH not ready"
+                        }
+                    }
+
+                    if (!isReachable) {
+                        error "EC2 instances are not reachable after multiple retries"
+                    }
+                }
+            }
+        }
+
         stage('Run Ansible Playbook') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'private-key', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USER')]) {
                     dir('ansible') {
                         script {
-                            // Run Ansible playbook, passing the private key
+                            // Run Ansible playbook
                             sh """
                             ansible-playbook -i inventory_aws_ec2.yaml playbook.yml \
                             --private-key $SSH_KEY_PATH \
@@ -94,6 +120,17 @@ pipeline {
                             """
                         }
                     }
+                }
+            }
+        }
+
+        stage('Deploy Helm Chart') {
+            steps {
+                script {
+                    // Install or upgrade the Helm release
+                    sh """
+                    helm upgrade --install my-release ./helm --values ./helm/values.yaml --namespace my-namespace --create-namespace
+                    """
                 }
             }
         }
