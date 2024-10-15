@@ -3,80 +3,80 @@
   gather_facts: true
 
   roles:
-  - role: containerd
-  - role: common
-  - role: kubernetes
+    - role: containerd
+    - role: common
+    - role: kubernetes
 
 - hosts: group_Name_master
   become: true
   gather_facts: true
 
   roles:
-  - role: master
-  - role: cni
+    - role: master
+    - role: cni
 
   tasks:
-  - name: Install required packages
-    apt:
-      name:
-      - curl
-      - software-properties-common
-      state: present
-      update_cache: yes
+    - name: Install required packages
+      apt:
+        name:
+          - curl
+          - software-properties-common
+        state: present
+        update_cache: yes
 
-  - name: Download Helm installation script
-    get_url:
-      url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-      dest: ./get_helm.sh
-      mode: 'u+x' 
+    - name: Download Helm installation script
+      get_url:
+        url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        dest: ~/get_helm.sh
+        mode: 'u+x' 
 
-  - name: Run the Helm installation script with superuser privileges
-    command: ./get_helm.sh
+    - name: Run the Helm installation script with superuser privileges
+      command: ./get_helm.sh
+      args:
+        chdir: ~  # Change to the user's home directory
 
-  - name: Clean up installation script
-    file:
-      path: ./get_helm.sh
-      state: absent
+    - name: Clean up installation script
+      file:
+        path: ~/get_helm.sh
+        state: absent
 
-  - name: Verify Helm installation
-    command: helm version
-    register: helm_version
+    - name: Verify Helm installation
+      command: helm version
+      register: helm_version
 
-  - debug:
-      var: helm_version.stdout
+    - debug:
+        var: helm_version.stdout
 
-  - name: Add the stable Helm repository
-    command: helm repo add stable https://charts.helm.sh/stable
+    - name: Add the stable Helm repository
+      command: helm repo add stable https://charts.helm.sh/stable
 
-  - name: Update Helm repositories
-    command: helm repo update
+    - name: Update Helm repositories
+      command: helm repo update
 
 - hosts: group_Name_worker
   become: true
   gather_facts: true
 
   roles:
-  - role: worker
+    - role: worker
 
-- name: Deploy Helm Chart on Master Node
-  hosts: group_Name_master
+- hosts: group_Name_master
   become: true
   tasks:
-  - name: Clone the repository
-    git:
-      repo: 'https://github.com/Mahmoudshookry/DevOps-Project.git'
-      dest: ~/DevOps-Project
-      version: master
-      force: yes
+    - name: Clone the repository
+      git:
+        repo: 'https://github.com/Mahmoudshookry/DevOps-Project.git'
+        dest: /home/ubuntu/DevOps-Project
+        version: master
+        force: yes
 
-- name: Check if helm-chart directory exists
-  ansible.builtin.stat:
-    path: /home/ubuntu/DevOps-Project/helm-chart
-  register: helm_chart_dir
+    - name: Check if helm-chart directory exists
+      ansible.builtin.stat:
+        path: /home/ubuntu/DevOps-Project/helm-chart
+      register: helm_chart_dir
 
-- name: Upgrade Helm release
-  command: helm upgrade my-release ./helm-chart --values ./helm-chart/values.yaml --namespace testing-namespace --create-namespace
-  args:
-    chdir: /home/ubuntu/DevOps-Project/helm-chart
-  when: helm_chart_dir.stat.exists
-
+    - name: Upgrade Helm release
+      command: helm upgrade my-release ./helm-chart --values ./helm-chart/values.yaml --namespace testing-namespace --create-namespace
+      args:
+        chdir: /home/ubuntu/DevOps-Project/helm-chart
+      when: helm_chart_dir.stat.exists
