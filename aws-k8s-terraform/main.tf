@@ -9,6 +9,7 @@ terraform {
 
 provider "aws" {
   region = "us-east-1"  # Change to your preferred region
+  version = ">= 5.76.0"
 }
 
 # Call Network Module
