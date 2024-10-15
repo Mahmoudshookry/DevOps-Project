@@ -129,7 +129,7 @@ pipeline {
                 script {
                     // Install or upgrade the Helm release
                     sh """
-                    helm upgrade --install my-release ./helm --values ./helm/values.yaml --namespace my-namespace --create-namespace
+                    helm upgrade --install my-release ./helm --values ./helm/values.yaml --namespace testing-namespace --create-namespace
                     """
                 }
             }
