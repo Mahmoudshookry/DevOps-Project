@@ -31,6 +31,8 @@ pipeline {
             }
         }
 
+        // Stage removed: Push to Docker Hub
+        /*
         stage('Push to Docker Hub') {
             steps {
                 script {
@@ -42,6 +44,7 @@ pipeline {
                 }
             }
         }
+        */
 
         stage('Clean Up') {
             steps {
@@ -93,7 +96,6 @@ pipeline {
             }
         }
 
-
         stage('Run Ansible Playbook') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'private-key', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USER')]) {
@@ -110,6 +112,7 @@ pipeline {
                 }
             }
         }
+    }
 
     post {
         success {
@@ -120,6 +123,3 @@ pipeline {
         }
     }
 }
-
-
-
