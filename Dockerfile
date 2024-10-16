@@ -1,11 +1,13 @@
 FROM node:latest
 
-COPY . /app/
-
 WORKDIR /app
 
-EXPOSE 4200
+COPY package*.json ./
 
 RUN npm install
+
+COPY . .
+
+EXPOSE 4200
 
 CMD ["node", "app.js"]
