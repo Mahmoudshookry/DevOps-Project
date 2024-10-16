@@ -31,8 +31,6 @@ pipeline {
             }
         }
 
-        // Stage removed: Push to Docker Hub
-        /*
         stage('Push to Docker Hub') {
             steps {
                 script {
@@ -44,7 +42,6 @@ pipeline {
                 }
             }
         }
-        */
 
         stage('Clean Up') {
             steps {
@@ -96,14 +93,31 @@ pipeline {
             }
         }
 
-        stage('Run Ansible Playbook') {
+        stage('Run Ansible Playbook for Infrastructure Setup') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'private-key', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USER')]) {
                     dir('ansible') {
                         script {
-                            // Run Ansible playbook
+                            // Run Ansible playbook for infrastructure setup
                             sh """
                             ansible-playbook -i inventory_aws_ec2.yaml playbook.yml \
+                            --private-key $SSH_KEY_PATH \
+                            -u $SSH_USER
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Run Ansible Playbook for Helm Deployment') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'private-key', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USER')]) {
+                    dir('ansible') {
+                        script {
+                            // Run Ansible playbook for Helm deployment
+                            sh """
+                            ansible-playbook -i inventory_aws_ec2.yaml helm-playbook.yaml \
                             --private-key $SSH_KEY_PATH \
                             -u $SSH_USER
                             """
