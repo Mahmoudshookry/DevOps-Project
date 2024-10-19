@@ -8,7 +8,7 @@ image:
   tag: "latest"
 
 # Port that the application inside the container listens on
-containerPort: 80
+containerPort: 4200
 
 # Type of the service (NodePort exposes the service on each Node's IP at a static port)
 service:
