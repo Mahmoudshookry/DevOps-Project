@@ -1,7 +1,6 @@
 ---
-- name: Deploy Monitoring Stack in Kubernetes
-  hosts: group_Name_master
+- hosts: group_Name_master
   become: true
   gather_facts: true
   roles:
-    - monitoring_stack  # Ensure this role exists in your roles directory
+    - monitoring_stack
