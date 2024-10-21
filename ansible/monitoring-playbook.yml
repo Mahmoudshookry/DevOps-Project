@@ -7,7 +7,6 @@
         name:
           - curl
           - software-properties-common
-          - kubectl
         state: present
         update_cache: yes
 
@@ -21,33 +20,49 @@
       command: helm repo update
 
     - name: Deploy Prometheus Helm chart
-      command: helm upgrade --install prometheus prometheus-community/prometheus --create-namespace --kubeconfig /home/ubuntu/.kube/config
+      command: helm upgrade --install prometheus prometheus-community/prometheus --values ./values.yaml --create-namespace --kubeconfig /home/ubuntu/.kube/config
 
     - name: Deploy Grafana Helm chart
-      command: helm upgrade --install grafana grafana/grafana --create-namespace --kubeconfig /home/ubuntu/.kube/config
+      command: helm upgrade --install grafana grafana/grafana --values ./grafana-values.yaml --create-namespace --kubeconfig /home/ubuntu/.kube/config
+
+    - name: Check for Prometheus server pods
+      command: kubectl get pods -n default -l app=prometheus-server --kubeconfig /home/ubuntu/.kube/config
+      register: prometheus_pods
+      ignore_errors: true
 
     - name: Get Prometheus server pod name
       command: kubectl get pods -n default -l app=prometheus-server -o jsonpath="{.items[0].metadata.name}" --kubeconfig /home/ubuntu/.kube/config
       register: prometheus_pod_name
+      when: prometheus_pods.rc == 0 and prometheus_pods.stdout != ""
+
+    - name: Fail if Prometheus pod not found
+      fail:
+        msg: "No Prometheus server pod found. Check the installation."
+      when: prometheus_pod_name is not defined
+
+    - name: Check for Grafana server pods
+      command: kubectl get pods -n default -l app=grafana --kubeconfig /home/ubuntu/.kube/config
+      register: grafana_pods
+      ignore_errors: true
 
     - name: Get Grafana server pod name
       command: kubectl get pods -n default -l app=grafana -o jsonpath="{.items[0].metadata.name}" --kubeconfig /home/ubuntu/.kube/config
       register: grafana_pod_name
+      when: grafana_pods.rc == 0 and grafana_pods.stdout != ""
 
-    - name: Port forward Prometheus to public IP
-      command: kubectl port-forward --address 0.0.0.0 {{ prometheus_pod_name.stdout }} 9090:9090 --kubeconfig /home/ubuntu/.kube/config
+    - name: Fail if Grafana pod not found
+      fail:
+        msg: "No Grafana server pod found. Check the installation."
+      when: grafana_pod_name is not defined
+
+    - name: Expose Prometheus using port-forwarding
+      command: kubectl port-forward svc/prometheus-server 9090:80 --kubeconfig /home/ubuntu/.kube/config
       async: 0
       poll: 0
-      register: prometheus_port_forward
-      ignore_errors: true
+      register: port_forward_prometheus
 
-    - name: Port forward Grafana to public IP
-      command: kubectl port-forward --address 0.0.0.0 {{ grafana_pod_name.stdout }} 3000:3000 --kubeconfig /home/ubuntu/.kube/config
+    - name: Expose Grafana using port-forwarding
+      command: kubectl port-forward svc/grafana 3000:80 --kubeconfig /home/ubuntu/.kube/config
       async: 0
       poll: 0
-      register: grafana_port_forward
-      ignore_errors: true
-
-    - name: Wait for port forwarding to start
-      pause:
-        seconds: 5
+      register: port_forward_grafana
