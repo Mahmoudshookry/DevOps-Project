@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS-Credentials')   // Correct credentials name
-        AWS_SECRET_ACCESS_KEY = credentials('AWS-Credentials')
+        AWS_ACCESS_KEY_ID     = credentials('AWS-Credinitial')   // Correct credentials name
+        AWS_SECRET_ACCESS_KEY = credentials('AWS-Credinitial')
         GITHUB_TOKEN          = credentials('github-token')
         DOCKER_IMAGE          = "m3bdlkawy/depi-project"
     }
