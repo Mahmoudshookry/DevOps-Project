@@ -98,7 +98,7 @@ pipeline {
                     dir('ansible') {
                         script {
                             sh """
-                            ansible-playbook -i inventory_aws_ec2.yaml monitoring-playbook.yaml \
+                            ansible-playbook -i inventory_aws_ec2.yaml monitoring-playbook.yml \
                             --private-key $SSH_KEY_PATH \
                             -u $SSH_USER
                             """
