@@ -20,10 +20,10 @@
       command: helm repo update
 
     - name: Deploy Prometheus Helm chart
-      command: helm upgrade --install prometheus prometheus-community/prometheus --values ./values.yaml --create-namespace --kubeconfig /home/ubuntu/.kube/config
+      command: helm upgrade --install prometheus prometheus-community/prometheus  --create-namespace --kubeconfig /home/ubuntu/.kube/config
 
     - name: Deploy Grafana Helm chart
-      command: helm upgrade --install grafana grafana/grafana --values ./grafana-values.yaml --create-namespace --kubeconfig /home/ubuntu/.kube/config
+      command: helm upgrade --install grafana grafana/grafana  --create-namespace --kubeconfig /home/ubuntu/.kube/config
 
     - name: Check for Prometheus server pods
       command: kubectl get pods -n default -l app=prometheus-server --kubeconfig /home/ubuntu/.kube/config
