@@ -1,6 +1,7 @@
----
 - hosts: group_Name_master
   become: true
   gather_facts: true
+  collections:
+    - community.general
   roles:
     - monitoring_stack
