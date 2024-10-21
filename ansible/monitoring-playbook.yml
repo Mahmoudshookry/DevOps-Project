@@ -1,8 +1,26 @@
----
 - hosts: group_Name_master
   become: true
   gather_facts: true
-  collections:
-    - community.general
-  roles:
-    - monitoring_stack
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - curl
+          - software-properties-common
+        state: present
+        update_cache: yes
+
+    - name: Add Prometheus Helm repository
+      command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+    - name: Add Grafana Helm repository
+      command: helm repo add grafana https://grafana.github.io/helm-charts
+
+    - name: Update Helm repositories
+      command: helm repo update
+
+    - name: Deploy Prometheus Helm chart
+      command: helm upgrade --install prometheus prometheus-community/prometheus --values ./values.yaml --create-namespace --kubeconfig /home/ubuntu/.kube/config
+
+    - name: Deploy Grafana Helm chart
+      command: helm upgrade --install grafana grafana/grafana --values ./grafana-values.yaml --create-namespace --kubeconfig /home/ubuntu/.kube/config
