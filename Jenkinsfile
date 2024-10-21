@@ -91,7 +91,8 @@ pipeline {
                 }
             }
         }
-   /*
+
+        /*
         stage('Run Ansible Playbook for Monitoring Stack Deployment') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'private-key', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USER')]) {
@@ -107,9 +108,9 @@ pipeline {
                 }
             }
         }
-    }
-   */
-        
+        */
+    } // Close stages block
+
     post {
         success {
             echo 'Deployment completed successfully!'
@@ -118,4 +119,4 @@ pipeline {
             echo 'Deployment failed!'
         }
     }
-}
+} // Close pipeline block
