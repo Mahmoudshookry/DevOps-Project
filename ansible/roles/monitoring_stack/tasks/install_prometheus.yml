@@ -1,6 +1,3 @@
-- name: Install required Ansible collections
-  ansible.builtin.command: ansible-galaxy collection install community.general
-
 - name: Add Prometheus Helm repo
   community.general.helm_repository:
     name: prometheus-community
