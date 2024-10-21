@@ -1,6 +1,6 @@
 ---
 - name: Install PyYAML on the host
-  hosts: 
+  hosts: aws_ec2
   become: true  # Use sudo if needed
   tasks:
     - name: Ensure python3-pip is installed
