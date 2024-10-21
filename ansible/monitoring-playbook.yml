@@ -1,3 +1,23 @@
+---
+- name: Install PyYAML on the host
+  hosts: 
+  become: true  # Use sudo if needed
+  tasks:
+    - name: Ensure python3-pip is installed
+      apt:
+        name: python3-pip
+        state: present
+      when: ansible_os_family == "Debian"  # Adjust this based on your OS
+
+    - name: Ensure pip is installed
+      command: pip3 install --upgrade pip
+      when: ansible_os_family == "Debian"  # Adjust this based on your OS
+
+    - name: Install PyYAML using pip
+      pip:
+        name: PyYAML
+        state: present
+
 - hosts: group_Name_master
   become: true
   gather_facts: true
